@@ -14,24 +14,19 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('fems_token');
     
-    // Attempt to fetch current user regardless of token for testing
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    // Attempt to fetch current user
     api.get('/auth/me')
       .then((res) => {
         setUser(res.data);
         localStorage.setItem('fems_user', JSON.stringify(res.data));
       })
       .catch(() => {
-        console.warn("Auth bypass: Using fallback admin for testing.");
-        // Fallback user matching backend's fallback
-        const fallbackUser = {
-          id: 1,
-          name: 'Super Admin (Bypass Mode)',
-          email: 'admin@fems.com',
-          role_name: 'Admin',
-          status: 'Active',
-          permissions: { all: true }
-        };
-        setUser(fallbackUser);
+        console.warn("Auth check failed: Token might be invalid.");
       })
       .finally(() => setLoading(false));
   }, []);

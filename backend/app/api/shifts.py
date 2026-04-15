@@ -56,6 +56,10 @@ def request_shift_swap(swap_in: ShiftSwapRequestCreate, db: Session = Depends(ge
     db.refresh(db_swap)
     return db_swap
 
+@router.get("/swap-requests", response_model=List[ShiftSwapRequestOut])
+def get_swap_requests(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return db.query(ShiftSwapRequest).offset(skip).limit(limit).all()
+
 @router.put("/swap-requests/{swap_id}/status", response_model=ShiftSwapRequestOut)
 def update_swap_status(swap_id: int, new_status: str, approved_by: int = None, db: Session = Depends(get_db)):
     db_swap = db.query(ShiftSwapRequest).filter(ShiftSwapRequest.id == swap_id).first()

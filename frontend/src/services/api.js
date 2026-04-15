@@ -24,10 +24,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isAuthRequest = error.config?.url?.includes('/auth/login');
+    const isAuthRequest = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('/auth/me');
     const isDemoMode = localStorage.getItem('fems_token') === 'demo-token';
+    const isLoginPage = window.location.pathname === '/login';
 
-    if (error.response?.status === 401 && !isAuthRequest && !isDemoMode) {
+    if (error.response?.status === 401 && !isAuthRequest && !isDemoMode && !isLoginPage) {
       localStorage.removeItem('fems_token');
       localStorage.removeItem('fems_refresh');
       localStorage.removeItem('fems_user');

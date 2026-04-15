@@ -64,6 +64,14 @@ def refresh_token(request: TokenRefreshRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: Employee = Depends(get_current_user)):
+    import json
+    permissions = {}
+    if current_user.role and current_user.role.permissions:
+        try:
+            permissions = json.loads(current_user.role.permissions)
+        except:
+            permissions = {}
+
     return UserResponse(
         id=current_user.id,
         employee_id=current_user.employee_id,
@@ -72,4 +80,5 @@ def get_me(current_user: Employee = Depends(get_current_user)):
         designation=current_user.designation,
         profile_photo_url=current_user.profile_photo_url,
         role_name=current_user.role.name if current_user.role else None,
+        permissions=permissions
     )

@@ -28,6 +28,8 @@ class UserResponse(BaseModel):
     designation: Optional[str] = None
     profile_photo_url: Optional[str] = None
     role_name: Optional[str] = None
+    permissions: Optional[dict] = None
+    permissions: Optional[dict] = None
 
     class Config:
         from_attributes = True
