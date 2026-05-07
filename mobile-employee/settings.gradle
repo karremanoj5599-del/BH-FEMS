@@ -1,0 +1,2 @@
+rootProject.name = "FEMS Employee"
+include ':app'

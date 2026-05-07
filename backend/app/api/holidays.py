@@ -1,36 +1,26 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.core.database import get_db
-from app.models import Holiday
-from app.schemas.holiday import HolidayCreate, HolidayOut
+from app.schemas.holiday import HolidayCreate, HolidayOut, HolidayUpdate
+from app.services.misc_service import MiscService
 
 router = APIRouter(prefix="/holidays", tags=["Holidays"])
 
 @router.post("/", response_model=HolidayOut)
 def create_holiday(holiday_in: HolidayCreate, db: Session = Depends(get_db)):
-    # Check for existing holiday on same date
-    existing = db.query(Holiday).filter(Holiday.holiday_date == holiday_in.holiday_date).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="A holiday already exists on this date")
-
-    db_holiday = Holiday(**holiday_in.model_dump())
-    db.add(db_holiday)
-    db.commit()
-    db.refresh(db_holiday)
-    return db_holiday
+    return MiscService.create_holiday(db, holiday_in)
 
 @router.get("/", response_model=List[HolidayOut])
 def get_holidays(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(Holiday).order_by(Holiday.holiday_date).offset(skip).limit(limit).all()
+    return MiscService.get_holidays(db, skip, limit)
+
+@router.put("/{holiday_id}", response_model=HolidayOut)
+def update_holiday(holiday_id: int, holiday_in: HolidayUpdate, db: Session = Depends(get_db)):
+    return MiscService.update_holiday(db, holiday_id, holiday_in)
 
 @router.delete("/{holiday_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_holiday(holiday_id: int, db: Session = Depends(get_db)):
-    db_holiday = db.query(Holiday).filter(Holiday.id == holiday_id).first()
-    if not db_holiday:
-        raise HTTPException(status_code=404, detail="Holiday not found")
-        
-    db.delete(db_holiday)
-    db.commit()
+    MiscService.delete_holiday(db, holiday_id)
     return None

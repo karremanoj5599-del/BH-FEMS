@@ -32,9 +32,14 @@ class SiteUpdate(BaseModel):
     site_type: Optional[str] = None
     description: Optional[str] = None
     status: Optional[str] = None
+    assigned_employee_ids: Optional[list[int]] = None
 
 class SiteOut(SiteBase):
     id: int
+    assigned_employee_ids: list[int] = []
+    created_at: Optional[datetime] = None
+    execution_status: Optional[str] = "No Activity"
+    task_count: Optional[int] = 0
 
     class Config:
         from_attributes = True

@@ -10,6 +10,12 @@ from app.core.security import (
 )
 from app.models import Employee
 from app.schemas.auth import LoginRequest, TokenResponse, TokenRefreshRequest, UserResponse
+from pydantic import BaseModel
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
+class GoogleLoginRequest(BaseModel):
+    credential: str
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -36,12 +42,59 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         )
 
     role_name = user.role.name if user.role else "Employee"
-    token_data = {"sub": str(user.id), "role": role_name}
+    token_data = {
+        "sub": str(user.id),
+        "user_id": user.id,
+        "role": role_name,
+        "email": user.email,
+        "full_name": user.name
+    }
     
     return TokenResponse(
         access_token=create_access_token(token_data),
         refresh_token=create_refresh_token(token_data),
     )
+
+
+@router.post("/google", response_model=TokenResponse)
+def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db)):
+    try:
+        # Note: In a production environment, Client ID should be verified.
+        # We pass verify_aud=False here to test token decoding since we haven't set up the CLIENT_ID yet.
+        idinfo = id_token.verify_oauth2_token(request.credential, google_requests.Request(), verify_aud=False)
+        
+        email = idinfo.get("email")
+        if not idinfo.get("email_verified", False):
+            raise ValueError("Email not verified by Google.")
+
+        user = db.query(Employee).filter(Employee.email == email).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access Denied: Email not registered in the system.",
+            )
+
+        if user.status != "Active":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account is inactive",
+            )
+
+        role_name = user.role.name if user.role else "Employee"
+        token_data = {
+            "sub": str(user.id),
+            "user_id": user.id,
+            "role": role_name,
+            "email": user.email,
+            "full_name": user.name
+        }
+        
+        return TokenResponse(
+            access_token=create_access_token(token_data),
+            refresh_token=create_refresh_token(token_data),
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google Token")
 
 
 @router.post("/refresh", response_model=TokenResponse)
@@ -55,7 +108,13 @@ def refresh_token(request: TokenRefreshRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
 
     role_name = user.role.name if user.role else "Employee"
-    token_data = {"sub": str(user.id), "role": role_name}
+    token_data = {
+        "sub": str(user.id),
+        "user_id": user.id,
+        "role": role_name,
+        "email": user.email,
+        "full_name": user.name
+    }
     return TokenResponse(
         access_token=create_access_token(token_data),
         refresh_token=create_refresh_token(token_data),

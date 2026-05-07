@@ -1,56 +1,58 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
-from datetime import datetime
+from typing import List, Optional
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models import Expense, ExpenseApproval, Employee
+from app.models import Employee
 from app.schemas.expense import (
-    ExpenseCreate, ExpenseOut,
+    ExpenseCreate, ExpenseOut, ExpenseUpdate,
     ExpenseApprovalCreate, ExpenseApprovalOut
 )
+from app.services.expense_service import ExpenseService
 
 router = APIRouter(prefix="/expenses", tags=["Expenses"])
 
 @router.post("/", response_model=ExpenseOut)
 def submit_expense(expense_in: ExpenseCreate, db: Session = Depends(get_db), current_user: Employee = Depends(get_current_user)):
-    db_expense = Expense(**expense_in.model_dump(), employee_id=current_user.id)
-    db.add(db_expense)
-    db.commit()
-    db.refresh(db_expense)
-    return db_expense
+    return ExpenseService.submit_expense(db, expense_in, current_user)
+
+@router.post("/bulk", response_model=List[ExpenseOut])
+def submit_bulk_expenses(expenses_in: List[ExpenseCreate], db: Session = Depends(get_db), current_user: Employee = Depends(get_current_user)):
+    return ExpenseService.submit_bulk_expenses(db, expenses_in, current_user)
 
 @router.get("/", response_model=List[ExpenseOut])
-def get_expenses(skip: int = 0, limit: int = 100, status_filter: str = None, employee_id: int = None, db: Session = Depends(get_db)):
-    query = db.query(Expense)
-    if status_filter:
-        query = query.filter(Expense.status == status_filter)
-    if employee_id:
-        query = query.filter(Expense.employee_id == employee_id)
-    return query.offset(skip).limit(limit).all()
+def get_expenses(
+    skip: int = 0, 
+    limit: int = 100, 
+    status_filter: str = None, 
+    employee_id: int = None, 
+    db: Session = Depends(get_db),
+    current_user: Employee = Depends(get_current_user)
+):
+    return ExpenseService.get_expenses(db, current_user, skip, limit, status_filter, employee_id)
 
 @router.get("/{expense_id}", response_model=ExpenseOut)
 def get_expense(expense_id: int, db: Session = Depends(get_db)):
-    db_expense = db.query(Expense).filter(Expense.id == expense_id).first()
-    if not db_expense:
-        raise HTTPException(status_code=404, detail="Expense not found")
-    return db_expense
+    return ExpenseService.get_expense(db, expense_id)
+
+@router.patch("/{expense_id}", response_model=ExpenseOut)
+def update_expense_status(expense_id: int, status_data: dict, db: Session = Depends(get_db)):
+    # Support for simple status update as used in frontend
+    status = status_data.get("status")
+    if not status:
+        raise HTTPException(status_code=400, detail="Status is required")
+    return ExpenseService.update_expense_status(db, expense_id, status)
+
+@router.put("/{expense_id}", response_model=ExpenseOut)
+def update_expense(expense_id: int, expense_in: ExpenseUpdate, db: Session = Depends(get_db), current_user: Employee = Depends(get_current_user)):
+    return ExpenseService.update_expense(db, expense_id, expense_in, current_user)
+
+@router.delete("/{expense_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_expense(expense_id: int, db: Session = Depends(get_db), current_user: Employee = Depends(get_current_user)):
+    ExpenseService.delete_expense(db, expense_id, current_user)
+    return None
 
 @router.post("/{expense_id}/approve", response_model=ExpenseApprovalOut)
 def approve_expense(expense_id: int, approval_in: ExpenseApprovalCreate, db: Session = Depends(get_db), current_user: Employee = Depends(get_current_user)):
-    db_expense = db.query(Expense).filter(Expense.id == expense_id).first()
-    if not db_expense:
-        raise HTTPException(status_code=404, detail="Expense not found")
-        
-    db_approval = ExpenseApproval(
-        **approval_in.model_dump(), 
-        approver_id=current_user.id,
-        approved_date=datetime.utcnow() if approval_in.status == "Approved" else None
-    )
-    db.add(db_approval)
-    db_expense.status = approval_in.status
-    
-    db.commit()
-    db.refresh(db_approval)
-    return db_approval
+    return ExpenseService.approve_expense(db, expense_id, approval_in, current_user)

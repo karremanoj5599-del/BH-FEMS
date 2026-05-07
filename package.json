@@ -1,0 +1,20 @@
+{
+  "name": "bh-fems-monorepo",
+  "version": "1.0.0",
+  "description": "Facility/Field Employee Management System Monorepo",
+  "private": true,
+  "workspaces": [
+    "web-admin",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "cd backend && python -m uvicorn app.main:app --reload",
+    "dev:web": "npm run dev --workspace=web-admin",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "test:backend": "cd backend && pytest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

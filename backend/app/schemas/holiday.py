@@ -12,6 +12,13 @@ class HolidayBase(BaseModel):
 class HolidayCreate(HolidayBase):
     pass
 
+class HolidayUpdate(BaseModel):
+    name: Optional[str] = None
+    holiday_date: Optional[date] = None
+    description: Optional[str] = None
+    is_floating: Optional[bool] = None
+    is_restricted: Optional[bool] = None
+
 class HolidayOut(HolidayBase):
     id: int
 

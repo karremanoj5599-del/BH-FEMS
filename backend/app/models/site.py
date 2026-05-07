@@ -2,6 +2,7 @@
 FEMS - Site Models
 Site, SiteAssignment, SiteIssue
 """
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, Date, Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -23,14 +24,19 @@ class Site(Base):
     site_type = Column(String(50), nullable=True)
     description = Column(Text, nullable=True)
     status = Column(String(20), default="Active", index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    assignments = relationship("SiteAssignment", back_populates="site")
-    issues = relationship("SiteIssue", back_populates="site")
-    tasks = relationship("Task", back_populates="site")
-    site_attendances = relationship("SiteAttendance", back_populates="site")
-    geofence_events = relationship("GeofenceEvent", back_populates="site")
+    assignments = relationship("SiteAssignment", back_populates="site", cascade="all, delete-orphan")
+    issues = relationship("SiteIssue", back_populates="site", cascade="all, delete-orphan")
+    tasks = relationship("Task", back_populates="site", cascade="all, delete-orphan")
+    site_attendances = relationship("SiteAttendance", back_populates="site", cascade="all, delete-orphan")
+    geofence_events = relationship("GeofenceEvent", back_populates="site", cascade="all, delete-orphan")
     expenses = relationship("Expense", back_populates="linked_site")
+
+    @property
+    def assigned_employee_ids(self):
+        return [a.employee_id for a in self.assignments]
 
 
 class SiteAssignment(Base):

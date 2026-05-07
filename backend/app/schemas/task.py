@@ -3,26 +3,39 @@ from typing import Optional
 from datetime import date, datetime
 
 class TaskBase(BaseModel):
-    site_id: int
+    title: Optional[str] = None
+    site_id: Optional[int] = None
+    location: Optional[str] = None
     assigned_employee: int
     description: str
     deadline: Optional[date] = None
-    status: Optional[str] = "Pending"
-    priority: Optional[str] = "Medium"
+    status: Optional[str] = "todo"
+    priority: Optional[str] = "medium"
     is_recurring: Optional[bool] = False
+    notes: Optional[str] = None
+    media_url: Optional[str] = None
 
 class TaskCreate(TaskBase):
     pass
 
 class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    site_id: Optional[int] = None
+    location: Optional[str] = None
+    assigned_employee: Optional[int] = None
     description: Optional[str] = None
     deadline: Optional[date] = None
     status: Optional[str] = None
     priority: Optional[str] = None
     is_recurring: Optional[bool] = None
+    notes: Optional[str] = None
+    media_url: Optional[str] = None
 
 class TaskOut(TaskBase):
     id: int
+    site_name: Optional[str] = None
+    assignee_name: Optional[str] = None
+    start_time: Optional[datetime] = None
 
     class Config:
         from_attributes = True

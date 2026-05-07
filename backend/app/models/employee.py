@@ -27,6 +27,7 @@ class Employee(Base):
     team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
     supervisor_id = Column(Integer, ForeignKey("employees.id"), nullable=True)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
+
     
     status = Column(String(20), default="Active", index=True)  # Active / Inactive / Resigned
     type = Column(String(30), default="Permanent")  # Permanent / Contract / Daily-wage
@@ -40,26 +41,38 @@ class Employee(Base):
     # Skills
     skills = relationship("EmployeeSkill", back_populates="employee", cascade="all, delete-orphan")
     
-    # Operational Relationships (using string references to avoid circular imports)
-    site_assignments = relationship("SiteAssignment", back_populates="employee", foreign_keys="SiteAssignment.employee_id")
+    # Operational Relationships
+    site_assignments = relationship("SiteAssignment", back_populates="employee", foreign_keys="SiteAssignment.employee_id", cascade="all, delete-orphan")
     supervised_site_assignments = relationship("SiteAssignment", back_populates="supervisor", foreign_keys="SiteAssignment.supervisor_id")
-    reported_issues = relationship("SiteIssue", back_populates="reporter")
+    reported_issues = relationship("SiteIssue", back_populates="reporter", cascade="all, delete-orphan")
     
-    assigned_tasks = relationship("Task", back_populates="assignee")
-    task_updates = relationship("TaskProgress", back_populates="updater")
-    material_usage = relationship("MaterialUsage", back_populates="employee")
+    assigned_tasks = relationship("Task", back_populates="assignee", cascade="all, delete-orphan")
+    task_updates = relationship("TaskProgress", back_populates="updater", cascade="all, delete-orphan")
+    material_usage = relationship("MaterialUsage", back_populates="employee", cascade="all, delete-orphan")
     
-    attendance_records = relationship("Attendance", back_populates="employee")
-    geofence_events = relationship("GeofenceEvent", back_populates="employee")
+    attendance_records = relationship("Attendance", back_populates="employee", cascade="all, delete-orphan")
+    geofence_events = relationship("GeofenceEvent", back_populates="employee", cascade="all, delete-orphan")
     
-    shifts = relationship("Shift", back_populates="employee")
-    shift_bids = relationship("ShiftBid", back_populates="employee")
+    shifts = relationship("Shift", back_populates="employee", cascade="all, delete-orphan")
+    shift_bids = relationship("ShiftBid", back_populates="employee", cascade="all, delete-orphan")
 
     # Leave and Expense relationships
-    expenses = relationship("Expense", back_populates="employee")
-    leaves = relationship("Leave", back_populates="employee")
-    leave_balances = relationship("LeaveBalance", back_populates="employee")
+    expenses = relationship("Expense", back_populates="employee", cascade="all, delete-orphan")
+    leaves = relationship("Leave", back_populates="employee", cascade="all, delete-orphan")
+    leave_balances = relationship("LeaveBalance", back_populates="employee", cascade="all, delete-orphan")
     
+    @property
+    def role_name(self):
+        return self.role.name if self.role else None
+
+    @property
+    def department_name(self):
+        return self.department.name if self.department else None
+
+    @property
+    def team_name(self):
+        return self.team.name if self.team else None
+
     def __repr__(self):
         return f"<Employee(id={self.id}, employee_id='{self.employee_id}', name='{self.name}')>"
 

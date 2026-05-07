@@ -1,22 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models import Log, Employee
+from app.models import Employee
 from app.schemas.log import LogCreate, LogOut
+from app.services.misc_service import MiscService
 
 router = APIRouter(prefix="/logs", tags=["Logs"])
 
 @router.post("/", response_model=LogOut)
 def create_log(log_in: LogCreate, db: Session = Depends(get_db), current_user: Employee = Depends(get_current_user)):
-    db_log = Log(**log_in.model_dump(), user_id=current_user.id, timestamp=datetime.utcnow())
-    db.add(db_log)
-    db.commit()
-    db.refresh(db_log)
-    return db_log
+    return MiscService.create_log(db, log_in, current_user.id)
 
 @router.get("/", response_model=List[LogOut])
 def get_logs(
@@ -27,12 +23,12 @@ def get_logs(
     action: str = None,
     db: Session = Depends(get_db)
 ):
-    query = db.query(Log)
-    if user_id:
-        query = query.filter(Log.user_id == user_id)
-    if entity_type:
-        query = query.filter(Log.entity_type == entity_type)
-    if action:
-        query = query.filter(Log.action == action)
+    logs = MiscService.get_logs(db, skip, limit, user_id, entity_type, action)
+    
+    result = []
+    for log in logs:
+        out = LogOut.model_validate(log)
+        out.user_name = log.user.name if log.user else "System"
+        result.append(out)
         
-    return query.order_by(Log.timestamp.desc()).offset(skip).limit(limit).all()
+    return result

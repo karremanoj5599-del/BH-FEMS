@@ -15,6 +15,7 @@ class LogOut(LogBase):
     id: int
     user_id: int
     timestamp: datetime
+    user_name: Optional[str] = None
 
     class Config:
         from_attributes = True

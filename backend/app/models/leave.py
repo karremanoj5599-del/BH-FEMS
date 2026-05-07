@@ -13,6 +13,7 @@ class LeaveType(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, nullable=False)
     entitlement = Column(Integer, default=0)
+    color = Column(String(50), nullable=True)
     carry_forward_rules = Column(Text, nullable=True)
 
     leaves = relationship("Leave", back_populates="leave_type")

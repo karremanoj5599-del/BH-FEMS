@@ -20,7 +20,10 @@ class LocationTrackingOut(LocationTrackingBase):
         from_attributes = True
 
 class SiteAttendanceBase(BaseModel):
-    site_id: int
+    site_id: Optional[int] = None
+    task_id: Optional[int] = None
+    start_time: Optional[datetime] = None
+    reached_at: Optional[datetime] = None
     check_in: Optional[datetime] = None
     check_out: Optional[datetime] = None
     progress: Optional[str] = None
@@ -36,6 +39,7 @@ class SiteAttendanceCreate(SiteAttendanceBase):
 class SiteAttendanceOut(SiteAttendanceBase):
     id: int
     attendance_id: int
+    execution_timeline: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -60,6 +64,8 @@ class AttendanceBase(BaseModel):
     check_out: Optional[datetime] = None
     lat: Optional[float] = None
     long: Optional[float] = None
+    check_out_lat: Optional[float] = None
+    check_out_long: Optional[float] = None
     status: Optional[str] = "Present"
     device_id: Optional[str] = None
     mode: Optional[str] = "GPS"
@@ -67,7 +73,11 @@ class AttendanceBase(BaseModel):
     selfie_url: Optional[str] = None
 
 class AttendanceCreate(AttendanceBase):
-    employee_id: int
+    employee_id: Optional[int] = None
+
+class AttendanceCheckOut(BaseModel):
+    lat: float
+    long: float
 
 class AttendanceOut(AttendanceBase):
     id: int
@@ -77,3 +87,9 @@ class AttendanceOut(AttendanceBase):
 
     class Config:
         from_attributes = True
+
+class AttendanceLive(AttendanceOut):
+    employee_name: str
+    department: Optional[str] = None
+    latest_lat: Optional[float] = None
+    latest_long: Optional[float] = None

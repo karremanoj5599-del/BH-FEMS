@@ -1,5 +1,5 @@
-# [tool.pyright]
-# include = ["app"]
-# exclude = ["**/__pycache__"]
-# venvPath = "."
-# venv = "venv"
+[tool.pyright]
+include = ["app"]
+exclude = ["**/__pycache__"]
+venvPath = "."
+venv = "venv"

@@ -29,6 +29,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # ── JWT Tokens ─────────────────────────────────────────────────────
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    """
+    Create a JWT access token containing user_id, email, role, and full_name.
+    """
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -58,47 +61,67 @@ def decode_token(token: str) -> dict:
 
 # ── Current User Dependency ───────────────────────────────────────
 
-def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    """Extract and validate current user from JWT token. Bypassed for testing."""
-    from app.models.employee import Employee  # Deferred import to avoid circular
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    """Extract and validate current user from JWT token."""
+    from app.models.employee import Employee
 
-    # FOR TESTING: Fallback to admin if token is invalid or missing
-    try:
-        payload = decode_token(token)
-        employee_id_raw = payload.get("sub")
-        if employee_id_raw:
-            employee_id = int(employee_id_raw)
-            user = db.query(Employee).filter(Employee.id == employee_id).first()
-            if user:
-                return user
-    except Exception:
-        pass
-
-    # DEFAULT FALLBACK (Admin User ID 1)
-    admin = db.query(Employee).filter(Employee.id == 1).first()
-    if admin:
-        return admin
+    payload = decode_token(token)
+    user_id_raw = payload.get("user_id")
+    if user_id_raw is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token payload missing user_id",
+        )
     
-    # LAST RESORT
-    return db.query(Employee).first()
+    user = db.query(Employee).filter(Employee.id == int(user_id_raw)).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+    
+    if user.status != "Active":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is inactive",
+        )
+        
+    return user
 
 
-
-# ── Role-Based Access Control ─────────────────────────────────────
+# ── Role-Based Access Control (RBAC) ──────────────────────────────
 
 class RoleChecker:
     """
     Dependency class for role-based route protection.
-    Usage: Depends(RoleChecker(["Admin", "HR"]))
+    Usage: Depends(RoleChecker(["admin", "hr"]))
     """
 
     def __init__(self, allowed_roles: list[str]):
         self.allowed_roles = allowed_roles
 
     def __call__(self, current_user=Depends(get_current_user)):
-        if current_user.role and current_user.role.name in self.allowed_roles:
+        # Ensure user has a role and the role has a name
+        user_role = getattr(current_user, "role", None)
+        role_name = getattr(user_role, "name", None) if user_role else None
+        
+        if role_name and role_name in self.allowed_roles:
             return current_user
+        
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Access denied. Required role(s): {', '.join(self.allowed_roles)}",
+            detail=f"Access denied. Required role(s): {', '.join(self.allowed_roles)}. Current role: {role_name}",
         )
+
+
+
+# Shorthand dependencies
+def admin_only(user=Depends(RoleChecker(["Admin"]))):
+    return user
+
+def hr_only(user=Depends(RoleChecker(["Admin", "HR"]))):
+    return user
+
+def employee_only(user=Depends(get_current_user)):
+    # Any active user is at least an employee
+    return user

@@ -6,7 +6,7 @@ from app.models.department import Department
 from app.models.team import Team
 from app.models.employee import Employee, Skill, EmployeeSkill
 from app.models.site import Site, SiteAssignment, SiteIssue
-from app.models.shift import ShiftType, Shift, ShiftSwapRequest, ShiftBid
+from app.models.shift import ShiftType, Shift, ShiftSwapRequest, ShiftBid, ShiftPolicy
 from app.models.task import Task, TaskProgress, MaterialUsage
 from app.models.attendance import Attendance, LocationTracking, SiteAttendance, GeofenceEvent
 from app.models.expense import Expense, ExpenseApproval
