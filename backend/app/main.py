@@ -90,6 +90,15 @@ def create_app() -> FastAPI:
     def health_check():
         return {"status": "healthy"}
 
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request, exc):
+        import traceback
+        return {
+            "error": str(exc),
+            "traceback": traceback.format_exc(),
+            "detail": "Internal Server Error - Debug Handler"
+        }
+
     return app
 
 
