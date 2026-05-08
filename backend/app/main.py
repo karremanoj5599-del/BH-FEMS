@@ -27,26 +27,22 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
     )
     # Use explicit origins for security, but ensure common local variations are covered
+    # Base allowed origins
     origins = [
         "http://localhost:5173",
-        "http://127.0.0.1:5173",
         "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:5175",
-        "http://127.0.0.1:5175",
-        "http://localhost:5180",
-        "http://127.0.0.1:5180",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000"
+        "https://bh-fems-web-admin.vercel.app",  # Production Frontend
+        "https://bh-fems-web-admin-i8id.vercel.app", # Backend itself
     ]
     
-    # Add settings origins if they exist
+    # Add settings origins and variations
     if settings.CORS_ORIGINS:
         for o in settings.CORS_ORIGINS:
-            if o not in origins:
-                origins.append(o)
+            o_clean = o.strip().rstrip("/")
+            if o_clean and o_clean not in origins:
+                origins.append(o_clean)
+                # Also add the version without 'https://' if it's there for extra safety
+                # though CORSMiddleware expects the full protocol.
 
     app.add_middleware(
         CORSMiddleware,
