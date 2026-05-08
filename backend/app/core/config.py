@@ -3,7 +3,8 @@ FEMS - Core Configuration
 Environment-based settings with sensible defaults for local development.
 """
 from pydantic_settings import BaseSettings
-from typing import Optional
+from pydantic import field_validator
+from typing import Optional, Any
 from pathlib import Path
 
 # Base directory for the app (where app/ resides)
@@ -44,6 +45,15 @@ class Settings(BaseSettings):
     # Pagination
     DEFAULT_PAGE_SIZE: int = 20
     MAX_PAGE_SIZE: int = 100
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Any) -> list[str] | str:
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",")]
+        elif isinstance(v, (list, str)):
+            return v
+        raise ValueError(v)
 
     model_config = {
         "env_file": str(ENV_PATH),
