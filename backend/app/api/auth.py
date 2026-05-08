@@ -22,38 +22,47 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/login", response_model=TokenResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(Employee).filter(Employee.email == request.email).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
-    
-    if not verify_password(request.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
-    
-    if user.status != "Active":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Account is inactive",
-        )
+    try:
+        user = db.query(Employee).filter(Employee.email == request.email).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+        
+        if not verify_password(request.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+        
+        if user.status != "Active":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account is inactive",
+            )
 
-    role_name = user.role.name if user.role else "Employee"
-    token_data = {
-        "sub": str(user.id),
-        "user_id": user.id,
-        "role": role_name,
-        "email": user.email,
-        "full_name": user.name
-    }
-    
-    return TokenResponse(
-        access_token=create_access_token(token_data),
-        refresh_token=create_refresh_token(token_data),
-    )
+        role_name = user.role.name if user.role else "Employee"
+        token_data = {
+            "sub": str(user.id),
+            "user_id": user.id,
+            "role": role_name,
+            "email": user.email,
+            "full_name": user.name
+        }
+        
+        return TokenResponse(
+            access_token=create_access_token(token_data),
+            refresh_token=create_refresh_token(token_data),
+        )
+    except Exception as e:
+        import traceback
+        print(f"LOGIN ERROR: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"Login failed: {str(e)}"
+        )
 
 
 @router.post("/google", response_model=TokenResponse)
