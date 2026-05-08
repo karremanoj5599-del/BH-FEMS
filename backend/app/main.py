@@ -77,8 +77,10 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     def startup():
-        # Create all tables
-        Base.metadata.create_all(bind=engine)
+        # In production/serverless, we rely on migrations (Alembic) 
+        # to handle schema updates, rather than create_all on every cold start.
+        if settings.DEBUG:
+            Base.metadata.create_all(bind=engine)
 
     @app.get("/")
     def root():
