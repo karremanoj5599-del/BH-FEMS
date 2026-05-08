@@ -46,6 +46,23 @@ class Settings(BaseSettings):
     DEFAULT_PAGE_SIZE: int = 20
     MAX_PAGE_SIZE: int = 100
 
+    @field_validator("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "JWT_REFRESH_TOKEN_EXPIRE_DAYS", "MAX_UPLOAD_SIZE_MB", "DEFAULT_PAGE_SIZE", "MAX_PAGE_SIZE", mode="before")
+    @classmethod
+    def cast_to_int(cls, v: Any) -> int:
+        if isinstance(v, str):
+            try:
+                return int(v)
+            except ValueError:
+                return v
+        return v
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def cast_to_bool(cls, v: Any) -> bool:
+        if isinstance(v, str):
+            return v.lower() in ("true", "1", "t", "y", "yes")
+        return v
+
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def fix_database_url(cls, v: Any) -> str:
@@ -71,4 +88,10 @@ class Settings(BaseSettings):
     }
 
 
-settings = Settings()
+try:
+    settings = Settings()
+except Exception as e:
+    import sys
+    print(f"CRITICAL ERROR: Failed to load settings: {e}")
+    # In Vercel, we still want to expose the error to the logs
+    raise e
