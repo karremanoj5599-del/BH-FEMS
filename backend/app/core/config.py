@@ -50,10 +50,12 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> list[str] | str:
         if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+            # Split by comma and strip whitespace AND trailing slashes
+            return [i.strip().rstrip("/") for i in v.split(",")]
+        elif isinstance(v, list):
+            # Also strip slashes if it's already a list
+            return [i.rstrip("/") for i in v]
+        return v
 
     model_config = {
         "env_file": str(ENV_PATH),
