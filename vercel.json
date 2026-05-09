@@ -1,12 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "web-admin/dist",
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "web-admin/dist" }
+      "src": "web-admin/dist/**",
+      "use": "@vercel/static"
     },
     {
       "src": "backend/app/main.py",
@@ -19,11 +16,25 @@
       "dest": "backend/app/main.py"
     },
     {
-      "handle": "filesystem"
+      "src": "/health",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/docs",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "web-admin/dist/assets/$1"
+    },
+    {
+      "src": "/vite.svg",
+      "dest": "web-admin/dist/vite.svg"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "web-admin/dist/index.html"
     }
-  ]
+  ],
+  "buildCommand": "npm run build"
 }
