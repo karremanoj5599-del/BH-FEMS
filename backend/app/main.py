@@ -90,14 +90,18 @@ def create_app() -> FastAPI:
     def health_check():
         return {"status": "healthy"}
 
+    from fastapi.responses import JSONResponse
     @app.exception_handler(Exception)
     async def global_exception_handler(request, exc):
         import traceback
-        return {
-            "error": str(exc),
-            "traceback": traceback.format_exc(),
-            "detail": "Internal Server Error - Debug Handler"
-        }
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": str(exc),
+                "detail": f"Backend Error: {str(exc)}",
+                "traceback": traceback.format_exc()
+            }
+        )
 
     return app
 
