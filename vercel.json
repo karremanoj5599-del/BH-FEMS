@@ -2,8 +2,9 @@
   "version": 2,
   "builds": [
     {
-      "src": "web-admin/dist/**",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "web-admin/dist" }
     },
     {
       "src": "backend/app/main.py",
@@ -13,28 +14,26 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/app/main.py"
+      "dest": "/backend/app/main.py"
     },
     {
       "src": "/health",
-      "dest": "backend/app/main.py"
+      "dest": "/backend/app/main.py"
     },
     {
       "src": "/docs",
-      "dest": "backend/app/main.py"
+      "dest": "/backend/app/main.py"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "web-admin/dist/assets/$1"
+      "src": "/openapi.json",
+      "dest": "/backend/app/main.py"
     },
     {
-      "src": "/vite.svg",
-      "dest": "web-admin/dist/vite.svg"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "web-admin/dist/index.html"
+      "dest": "/index.html"
     }
-  ],
-  "buildCommand": "npm run build"
+  ]
 }
