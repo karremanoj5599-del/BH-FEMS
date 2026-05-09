@@ -26,6 +26,8 @@ import EmployeePortal from './pages/portal/EmployeePortal';
 import EmployeeTimeline from './pages/attendance/EmployeeTimeline';
 import ExecutionPage from './pages/portal/ExecutionPage';
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 function ProtectedRoute({ children, permission, roles }) {
   const { user, loading, hasPermission, hasRole } = useAuth();
   
@@ -45,62 +47,65 @@ function ProtectedRoute({ children, permission, roles }) {
 
 export default function App() {
   const adminRoles = ['Admin', 'HR', 'Manager', 'Supervisor'];
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Public */}
-          <Route path="/login" element={<Login />} />
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            {/* Public */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Protected — inside MainLayout */}
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<ProtectedRoute roles={adminRoles}><Dashboard /></ProtectedRoute>} />
-            <Route path="/portal" element={<EmployeePortal />} />
-            
-            <Route path="/employees" element={<ProtectedRoute roles={adminRoles}><EmployeeList /></ProtectedRoute>} />
-            <Route path="/departments" element={<ProtectedRoute roles={adminRoles}><DepartmentList /></ProtectedRoute>} />
-            <Route path="/teams" element={<ProtectedRoute roles={adminRoles}><TeamList /></ProtectedRoute>} />
-            <Route path="/roles" element={<ProtectedRoute roles={['Admin']}><RolesList /></ProtectedRoute>} />
-            
-            {/* Phase 2: Sites & Shifts */}
-            <Route path="/shifts" element={<ProtectedRoute roles={adminRoles}><ShiftsPage /></ProtectedRoute>} />
-            <Route path="/my-shifts" element={<MyShiftsPage />} />
-            <Route path="/shifts/employee/:id" element={<ProtectedRoute roles={adminRoles}><EmployeeShiftPlanner /></ProtectedRoute>} />
-            <Route path="/sites" element={<ProtectedRoute roles={adminRoles}><SitesPage /></ProtectedRoute>} />
-            <Route path="/sites/new" element={<ProtectedRoute roles={adminRoles}><SitesPage mode="new" /></ProtectedRoute>} />
-            <Route path="/sites/in-progress" element={<ProtectedRoute roles={adminRoles}><SitesPage mode="in-progress" /></ProtectedRoute>} />
-            <Route path="/sites/completed" element={<ProtectedRoute roles={adminRoles}><SitesPage mode="completed" /></ProtectedRoute>} />
-            <Route path="/my-sites" element={<MySitesPage />} />
-            <Route path="/my-sites/completed" element={<MySitesPage mode="completed" />} />
-            
-            {/* Phase 3: Tasks & Expenses */}
-            <Route path="/tasks" element={<TasksPage />} />
-            <Route path="/expenses" element={<ExpensesPage />} />
-            <Route path="/execution/:type/:id" element={<ExecutionPage />} />
-            
-            {/* Phase 4: Attendance */}
-            <Route path="/attendance" element={<AttendancePage />} />
-            <Route path="/attendance/calendar" element={<AttendanceCalendar />} />
-            <Route path="/attendance/timeline/:attendanceId" element={<EmployeeTimeline />} />
-            
-            {/* Phase 5: Leaves & Holidays */}
-            <Route path="/leaves" element={<LeavesPage />} />
-            <Route path="/holidays" element={<HolidaysPage />} />
-            
-            {/* Phase 6: Reports */}
-            <Route path="/reports" element={<ProtectedRoute roles={adminRoles}><ReportsPage /></ProtectedRoute>} />
-            <Route path="/reports/employee/:id" element={<ProtectedRoute roles={adminRoles}><EmployeeDailyReport /></ProtectedRoute>} />
-            <Route path="/reports/employee/:id/monthly" element={<ProtectedRoute roles={adminRoles}><EmployeeMonthlyReport /></ProtectedRoute>} />
-            
-            {/* Phase 7: Logs */}
-            <Route path="/logs" element={<ProtectedRoute roles={['Admin', 'Manager']}><LogsPage /></ProtectedRoute>} />
-          </Route>
+            {/* Protected — inside MainLayout */}
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<ProtectedRoute roles={adminRoles}><Dashboard /></ProtectedRoute>} />
+              <Route path="/portal" element={<EmployeePortal />} />
+              
+              <Route path="/employees" element={<ProtectedRoute roles={adminRoles}><EmployeeList /></ProtectedRoute>} />
+              <Route path="/departments" element={<ProtectedRoute roles={adminRoles}><DepartmentList /></ProtectedRoute>} />
+              <Route path="/teams" element={<ProtectedRoute roles={adminRoles}><TeamList /></ProtectedRoute>} />
+              <Route path="/roles" element={<ProtectedRoute roles={['Admin']}><RolesList /></ProtectedRoute>} />
+              
+              {/* Phase 2: Sites & Shifts */}
+              <Route path="/shifts" element={<ProtectedRoute roles={adminRoles}><ShiftsPage /></ProtectedRoute>} />
+              <Route path="/my-shifts" element={<MyShiftsPage />} />
+              <Route path="/shifts/employee/:id" element={<ProtectedRoute roles={adminRoles}><EmployeeShiftPlanner /></ProtectedRoute>} />
+              <Route path="/sites" element={<ProtectedRoute roles={adminRoles}><SitesPage /></ProtectedRoute>} />
+              <Route path="/sites/new" element={<ProtectedRoute roles={adminRoles}><SitesPage mode="new" /></ProtectedRoute>} />
+              <Route path="/sites/in-progress" element={<ProtectedRoute roles={adminRoles}><SitesPage mode="in-progress" /></ProtectedRoute>} />
+              <Route path="/sites/completed" element={<ProtectedRoute roles={adminRoles}><SitesPage mode="completed" /></ProtectedRoute>} />
+              <Route path="/my-sites" element={<MySitesPage />} />
+              <Route path="/my-sites/completed" element={<MySitesPage mode="completed" />} />
+              
+              {/* Phase 3: Tasks & Expenses */}
+              <Route path="/tasks" element={<TasksPage />} />
+              <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/execution/:type/:id" element={<ExecutionPage />} />
+              
+              {/* Phase 4: Attendance */}
+              <Route path="/attendance" element={<AttendancePage />} />
+              <Route path="/attendance/calendar" element={<AttendanceCalendar />} />
+              <Route path="/attendance/timeline/:attendanceId" element={<EmployeeTimeline />} />
+              
+              {/* Phase 5: Leaves & Holidays */}
+              <Route path="/leaves" element={<LeavesPage />} />
+              <Route path="/holidays" element={<HolidaysPage />} />
+              
+              {/* Phase 6: Reports */}
+              <Route path="/reports" element={<ProtectedRoute roles={adminRoles}><ReportsPage /></ProtectedRoute>} />
+              <Route path="/reports/employee/:id" element={<ProtectedRoute roles={adminRoles}><EmployeeDailyReport /></ProtectedRoute>} />
+              <Route path="/reports/employee/:id/monthly" element={<ProtectedRoute roles={adminRoles}><EmployeeMonthlyReport /></ProtectedRoute>} />
+              
+              {/* Phase 7: Logs */}
+              <Route path="/logs" element={<ProtectedRoute roles={['Admin', 'Manager']}><LogsPage /></ProtectedRoute>} />
+            </Route>
 
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            {/* Catch-all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }

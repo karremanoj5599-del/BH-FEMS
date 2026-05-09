@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogIn } from 'lucide-react';
 
+import { GoogleLogin } from '@react-oauth/google';
+
 export default function Login() {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,6 +25,21 @@ export default function Login() {
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.detail || 'Login failed. Check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError('');
+    try {
+      if (credentialResponse.credential) {
+        await googleLogin(credentialResponse.credential);
+        navigate('/');
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Google Login failed. Is your email registered?');
     } finally {
       setLoading(false);
     }
@@ -84,9 +101,15 @@ export default function Login() {
 
         <div className="login-divider">OR</div>
 
-        <div className="google-auth-placeholder">
-          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" style={{ width: 20, height: 20 }} />
-          Sign in with Google
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Login Failed')}
+            useOneTap
+            theme="filled_blue"
+            shape="pill"
+            width="340"
+          />
         </div>
       </div>
     </div>

@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "npm run build --workspace=web-admin",
     "dev:backend": "cd backend && python -m uvicorn app.main:app --reload",
     "dev:web": "npm run dev --workspace=web-admin",
     "docker:up": "docker-compose up -d",
