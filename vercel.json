@@ -19,9 +19,7 @@
       "dest": "backend/app/main.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1",
-      "continue": true
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
