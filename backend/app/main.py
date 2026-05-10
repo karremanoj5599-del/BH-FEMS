@@ -73,6 +73,8 @@ def create_app() -> FastAPI:
     app.include_router(logs.router, prefix=settings.API_PREFIX)
     app.include_router(points.router, prefix=settings.API_PREFIX, tags=["Points"])
 
+    @app.on_event("startup")
+    def startup():
         if settings.DEBUG:
             Base.metadata.create_all(bind=engine)
         
