@@ -18,17 +18,18 @@ class OrgService:
         
         # Extract data and handle description gracefully
         role_dict = data.model_dump()
-        role = Role(**role_dict)
         
         try:
+            # Try with everything first
+            role = Role(**role_dict)
             db.add(role)
             db.commit()
             db.refresh(role)
             return role
         except Exception as e:
             db.rollback()
-            # If description is the problem, try without it
-            if "description" in str(e).lower():
+            # If description is the problem (invalid keyword), try without it
+            if "description" in str(e).lower() or "unexpected keyword" in str(e).lower():
                 role_dict.pop("description", None)
                 role = Role(**role_dict)
                 db.add(role)
@@ -46,14 +47,16 @@ class OrgService:
         
         try:
             for key, value in update_data.items():
-                setattr(role, key, value)
+                if hasattr(Role, key):
+                    setattr(role, key, value)
             db.commit()
         except Exception as e:
             db.rollback()
             if "description" in str(e).lower():
                 update_data.pop("description", None)
                 for key, value in update_data.items():
-                    setattr(role, key, value)
+                    if hasattr(Role, key):
+                        setattr(role, key, value)
                 db.commit()
             else:
                 raise e
