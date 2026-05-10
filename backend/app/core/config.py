@@ -73,9 +73,13 @@ class Settings(BaseSettings):
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> list[str] | str:
-        if isinstance(v, str) and not v.startswith("["):
-            # Split by comma and strip whitespace AND trailing slashes
-            return [i.strip().rstrip("/") for i in v.split(",")]
+        if isinstance(v, str):
+            # Handle empty string gracefully (e.g. Railway env var set to "")
+            if not v.strip():
+                return ["http://localhost:5173", "http://localhost:3000"]
+            if not v.startswith("["):
+                # Split by comma and strip whitespace AND trailing slashes
+                return [i.strip().rstrip("/") for i in v.split(",") if i.strip()]
         elif isinstance(v, list):
             # Also strip slashes if it's already a list
             return [i.rstrip("/") for i in v]
