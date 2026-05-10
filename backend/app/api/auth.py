@@ -65,12 +65,17 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         )
 
 
+from app.core.config import settings
+
 @router.post("/google", response_model=TokenResponse)
 def google_login(request: GoogleLoginRequest, db: Session = Depends(get_db)):
     try:
-        # Note: In a production environment, Client ID should be verified.
-        # We pass verify_aud=False here to test token decoding since we haven't set up the CLIENT_ID yet.
-        idinfo = id_token.verify_oauth2_token(request.credential, google_requests.Request(), verify_aud=False)
+        # Verify the Google Token using the Client ID from settings
+        idinfo = id_token.verify_oauth2_token(
+            request.credential, 
+            google_requests.Request(), 
+            audience=settings.GOOGLE_CLIENT_ID
+        )
         
         email = idinfo.get("email")
         if not idinfo.get("email_verified", False):

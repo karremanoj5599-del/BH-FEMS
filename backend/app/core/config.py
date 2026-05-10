@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     DEFAULT_PAGE_SIZE: int = 20
     MAX_PAGE_SIZE: int = 100
 
+    # Google Auth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
     @field_validator("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "JWT_REFRESH_TOKEN_EXPIRE_DAYS", "MAX_UPLOAD_SIZE_MB", "DEFAULT_PAGE_SIZE", "MAX_PAGE_SIZE", mode="before")
     @classmethod
     def cast_to_int(cls, v: Any) -> int:
