@@ -1,5 +1,11 @@
 import React from 'react';
 import taskService from '../../../services/taskService';
+import { 
+  X, Camera, Image as ImageIcon, Loader2, 
+  Navigation, AlertCircle, Clock 
+} from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 export default function TaskModals({ 
   modalType, setShowModal, selectedTask, sites, employees, detailTask,
