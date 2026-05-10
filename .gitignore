@@ -25,3 +25,4 @@ Thumbs.db
 
 # Build output
 web-admin/dist/
+backend/static/

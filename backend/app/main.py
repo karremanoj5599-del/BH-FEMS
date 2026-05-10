@@ -5,6 +5,8 @@ Main FastAPI Application Entry Point
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 from app.core.config import settings
 from app.core.database import engine, Base
 
@@ -100,6 +102,31 @@ def create_app() -> FastAPI:
                 "traceback": traceback.format_exc()
             }
         )
+
+    # Serve static files if they exist (for production Docker deployment)
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static")
+    if os.path.isdir(static_dir):
+        # Mount the assets folder explicitly
+        assets_dir = os.path.join(static_dir, "assets")
+        if os.path.isdir(assets_dir):
+            app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+        
+        @app.get("/{full_path:path}")
+        async def serve_spa(full_path: str):
+            # Do not intercept API or docs routes
+            if full_path.startswith(settings.API_PREFIX.lstrip("/")) or full_path in ["docs", "redoc", "openapi.json"]:
+                from fastapi import HTTPException
+                raise HTTPException(status_code=404, detail="Not Found")
+                
+            index_file = os.path.join(static_dir, "index.html")
+            requested_file = os.path.join(static_dir, full_path)
+            
+            # Serve requested file if it exists (e.g., /vite.svg, /favicon.ico)
+            if os.path.isfile(requested_file):
+                return FileResponse(requested_file)
+            
+            # Fallback to index.html for SPA routing
+            return FileResponse(index_file)
 
     return app
 
