@@ -11,6 +11,7 @@ console.log('FEMS API initialized with base URL:', API_BASE);
 const api = axios.create({
   baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
+  timeout: 60000, // 60 seconds timeout for large photo uploads
 });
 
 // Request interceptor — attach JWT

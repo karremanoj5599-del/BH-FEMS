@@ -130,10 +130,12 @@ export default function ExecutionTracker({ targetType, targetId, targetData, onC
         notes: remarks,
         photos: JSON.stringify(photos),
       };
-      const res = await api.post(`/attendance/site/${session.id}/complete`, null, { params: payload });
+      const res = await api.post(`/attendance/site/${session.id}/complete`, payload);
       setSession(res.data);
     } catch (err) {
-      setError('Failed to submit completion report');
+      console.error('Completion error:', err);
+      const msg = err.response?.data?.detail || err.message || 'Failed to submit completion report';
+      setError(typeof msg === 'string' ? msg : 'Submission failed. Please check your internet connection and try again.');
     } finally {
       setSubmitting(false);
     }

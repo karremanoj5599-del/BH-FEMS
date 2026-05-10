@@ -93,3 +93,6 @@ class AttendanceLive(AttendanceOut):
     department: Optional[str] = None
     latest_lat: Optional[float] = None
     latest_long: Optional[float] = None
+class SiteComplete(BaseModel):
+    notes: str
+    photos: Optional[str] = None

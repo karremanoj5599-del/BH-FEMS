@@ -29,14 +29,15 @@ def site_check_in(
 ):
     return AttendanceService.site_check_in(db, site_att_id)
 
+from app.schemas.attendance import SiteAttendanceOut, SiteComplete
+
 @router.post("/site/{site_att_id}/complete", response_model=SiteAttendanceOut)
 def site_complete(
     site_att_id: int,
-    notes: str,
-    photos: Optional[str] = None,
+    data: SiteComplete,
     db: Session = Depends(get_db)
 ):
-    return AttendanceService.site_complete(db, site_att_id, notes, photos)
+    return AttendanceService.site_complete(db, site_att_id, data.notes, data.photos)
 
 @router.post("/site/{site_att_id}/check-out", response_model=SiteAttendanceOut)
 def site_check_out(
