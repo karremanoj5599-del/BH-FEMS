@@ -73,7 +73,7 @@ export function AuthProvider({ children }) {
 
   const hasPermission = (perm) => {
     if (!user) return false;
-    if (user.role_name === 'Admin' || user.permissions?.all) return true;
+    if (user.role_name === 'Admin' || user.role_name === 'Super Admin' || user.permissions?.all) return true;
     
     // Exact match
     if (user.permissions && user.permissions[perm]) return true;
@@ -89,9 +89,9 @@ export function AuthProvider({ children }) {
 
   const isEmployeeView = (moduleName) => {
     if (!user) return true;
-    if (user.role_name === 'Admin' || user.permissions?.all) return false;
+    if (user.role_name === 'Admin' || user.role_name === 'Super Admin' || user.permissions?.all) return false;
     
-    const isManagement = ['Admin', 'HR', 'Manager', 'Supervisor'].includes(user.role_name);
+    const isManagement = ['Super Admin', 'Admin', 'HR', 'Manager', 'Supervisor'].includes(user.role_name);
 
     if (moduleName) {
       // If they have the module permission AND are in management, show management view (return false)

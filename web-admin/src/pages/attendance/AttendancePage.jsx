@@ -10,7 +10,7 @@ import PersonalHistory from './components/PersonalHistory';
 
 export default function AttendancePage() {
   const { hasRole } = useAuth();
-  const isAdmin = hasRole(['Admin', 'HR', 'Manager', 'Supervisor']);
+  const isAdmin = hasRole(['Super Admin', 'Admin', 'HR', 'Manager', 'Supervisor']);
   const [activeTab, setActiveTab] = useState('personal'); 
   const [isPresent, setIsPresent] = useState(false);
   const [checkInTime, setCheckInTime] = useState(null);

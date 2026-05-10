@@ -33,7 +33,7 @@ export default function LeavesPage() {
   const [coverage, setCoverage] = useState(null);
   const [earnings, setEarnings] = useState([]);
 
-  const isAdmin = hasRole(['Admin', 'HR', 'Manager', 'Supervisor']);
+  const isAdmin = hasRole(['Super Admin', 'Admin', 'HR', 'Manager', 'Supervisor']);
 
   const fetchMyLeaves = async () => {
     try {
