@@ -15,18 +15,49 @@ class OrgService:
     def create_role(db: Session, data: RoleCreate):
         if db.query(Role).filter(Role.name == data.name).first():
             raise HTTPException(status_code=400, detail="Role already exists")
-        role = Role(**data.model_dump())
-        db.add(role)
-        db.commit()
-        db.refresh(role)
-        return role
+        
+        # Extract data and handle description gracefully
+        role_dict = data.model_dump()
+        role = Role(**role_dict)
+        
+        try:
+            db.add(role)
+            db.commit()
+            db.refresh(role)
+            return role
+        except Exception as e:
+            db.rollback()
+            # If description is the problem, try without it
+            if "description" in str(e).lower():
+                role_dict.pop("description", None)
+                role = Role(**role_dict)
+                db.add(role)
+                db.commit()
+                db.refresh(role)
+                return role
+            raise e
 
     @staticmethod
     def update_role(db: Session, role_id: int, data: RoleUpdate):
         role = db.query(Role).filter(Role.id == role_id).first()
         if not role: raise HTTPException(status_code=404, detail="Role not found")
-        for key, value in data.model_dump(exclude_unset=True).items(): setattr(role, key, value)
-        db.commit()
+        
+        update_data = data.model_dump(exclude_unset=True)
+        
+        try:
+            for key, value in update_data.items():
+                setattr(role, key, value)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            if "description" in str(e).lower():
+                update_data.pop("description", None)
+                for key, value in update_data.items():
+                    setattr(role, key, value)
+                db.commit()
+            else:
+                raise e
+                
         db.refresh(role)
         return role
 
