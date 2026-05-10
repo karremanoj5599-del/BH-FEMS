@@ -126,7 +126,7 @@ export default function AttendancePage() {
             }
           });
         }
-      }, 1 * 60 * 1000); // Sync every 1 minute for exact route tracking
+      }, 10 * 1000); // Sync every 10 seconds for ultra-high accuracy route tracking
     } else {
       if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
     }
