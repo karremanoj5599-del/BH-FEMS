@@ -11,7 +11,6 @@ class Role(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, nullable=False, index=True)
-    description = Column(String(255), nullable=True)
     permissions = Column(Text, nullable=True)  # Stored as JSON string
 
     # Relationships
