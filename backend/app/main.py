@@ -3,6 +3,7 @@ FEMS - Field Employee Management System
 Main FastAPI Application Entry Point
 """
 from fastapi import FastAPI
+from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -72,12 +73,30 @@ def create_app() -> FastAPI:
     app.include_router(logs.router, prefix=settings.API_PREFIX)
     app.include_router(points.router, prefix=settings.API_PREFIX, tags=["Points"])
 
-    @app.on_event("startup")
-    def startup():
-        # In production/serverless, we rely on migrations (Alembic) 
-        # to handle schema updates, rather than create_all on every cold start.
         if settings.DEBUG:
             Base.metadata.create_all(bind=engine)
+        
+        # Production Auto-Migration for Points System
+        try:
+            with engine.connect() as conn:
+                # 1. Add points_balance to employees if missing
+                conn.execute(text("ALTER TABLE employees ADD COLUMN IF NOT EXISTS points_balance INTEGER DEFAULT 200"))
+                
+                # 2. Create point_transactions table if missing
+                conn.execute(text("""
+                    CREATE TABLE IF NOT EXISTS point_transactions (
+                        id SERIAL PRIMARY KEY,
+                        employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+                        amount INTEGER NOT NULL,
+                        reason VARCHAR(200) NOT NULL,
+                        reference_id VARCHAR(50),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """))
+                conn.commit()
+                print("Database migrations (Points System) completed successfully.")
+        except Exception as e:
+            print(f"Migration warning (might be handled by Alembic): {e}")
 
     # Removed root route to allow SPA to take priority on /
 
