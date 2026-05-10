@@ -52,6 +52,6 @@ def update_team(team_id: int, data: TeamUpdate, db: Session = Depends(get_db), _
     )
 
 @router.delete("/{team_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_team(team_id: int, db: Session = Depends(get_db), _=Depends(RoleChecker(["Admin"]))):
+def delete_team(team_id: int, db: Session = Depends(get_db), _=Depends(RoleChecker(["Super Admin", "Admin"]))):
     OrgService.delete_team(db, team_id)
     return None

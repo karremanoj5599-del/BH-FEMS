@@ -46,6 +46,6 @@ def update_department(dept_id: int, data: DepartmentUpdate, db: Session = Depend
                                manager_id=dept.manager_id, status=dept.status)
 
 @router.delete("/{dept_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_department(dept_id: int, db: Session = Depends(get_db), _=Depends(RoleChecker(["Admin"]))):
+def delete_department(dept_id: int, db: Session = Depends(get_db), _=Depends(RoleChecker(["Super Admin", "Admin"]))):
     OrgService.delete_department(db, dept_id)
     return None

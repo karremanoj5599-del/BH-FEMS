@@ -105,7 +105,7 @@ class RoleChecker:
         user_role = getattr(current_user, "role", None)
         role_name = getattr(user_role, "name", None) if user_role else None
         
-        if role_name and role_name in self.allowed_roles:
+        if role_name and (role_name == "Super Admin" or role_name in self.allowed_roles):
             return current_user
         
         raise HTTPException(

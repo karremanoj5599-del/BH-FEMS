@@ -97,7 +97,7 @@ def delete_employee(
     employee_id: int,
     db: Session = Depends(get_db),
     current_user: Employee = Depends(get_current_user),
-    _=Depends(RoleChecker(["Admin"]))
+    _=Depends(RoleChecker(["Super Admin", "Admin"]))
 ):
     emp = EmployeeService.get_employee(db, employee_id)
     EmployeeService.delete_employee(db, employee_id)
