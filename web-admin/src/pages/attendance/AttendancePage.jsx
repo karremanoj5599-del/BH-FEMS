@@ -126,7 +126,7 @@ export default function AttendancePage() {
             }
           });
         }
-      }, 5 * 60 * 1000); 
+      }, 1 * 60 * 1000); // Sync every 1 minute for exact route tracking
     } else {
       if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
     }

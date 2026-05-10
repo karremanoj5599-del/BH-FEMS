@@ -276,16 +276,16 @@ export default function EmployeeDailyReport() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               
-              {/* Route polyline */}
+              {/* Route polyline - Solid for exact route look */}
               {mapData.path.length > 1 && (
                 <Polyline 
                   positions={mapData.path} 
                   pathOptions={{ 
                     color: '#6366f1', 
-                    weight: 4, 
-                    opacity: 0.8, 
-                    dashArray: '8, 12',
-                    lineCap: 'round'
+                    weight: 5, 
+                    opacity: 0.9, 
+                    lineCap: 'round',
+                    lineJoin: 'round'
                   }} 
                 />
               )}
