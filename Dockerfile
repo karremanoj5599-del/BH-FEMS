@@ -1,5 +1,5 @@
 # Stage 1: Build the React Frontend
-FROM node:20-alpine as frontend-builder
+FROM node:20-slim as frontend-builder
 WORKDIR /app
 
 # Copy package files and install dependencies
