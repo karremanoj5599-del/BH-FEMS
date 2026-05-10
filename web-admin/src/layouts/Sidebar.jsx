@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Users, Building2, UsersRound, Clock, MapPin, Navigation,
   ClipboardList, Receipt, CalendarDays, CalendarCheck, BarChart3,
-  Shield, Activity, ChevronLeft, ChevronRight, Plus, CheckCircle
+  Shield, Activity, ChevronLeft, ChevronRight, Plus, CheckCircle, Star
 } from 'lucide-react';
 
 const navSections = [
@@ -61,7 +61,7 @@ const navSections = [
 ];
 
 export default function Sidebar({ collapsed, onToggle }) {
-  const { hasPermission, hasRole } = useAuth();
+  const { user, hasPermission, hasRole } = useAuth();
   const location = useLocation();
 
   return (
@@ -111,6 +111,16 @@ export default function Sidebar({ collapsed, onToggle }) {
           );
         })}
       </nav>
+      
+      {!collapsed && user && (
+        <div style={{ margin: '16px 12px', padding: '12px', background: 'rgba(99, 102, 241, 0.05)', borderRadius: '12px', border: '1px solid rgba(99, 102, 241, 0.1)' }}>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bidding Points</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: 'var(--primary-400)', fontSize: '15px' }}>
+            <Star size={14} fill="var(--primary-400)" />
+            {user.points_balance ?? 200} pts
+          </div>
+        </div>
+      )}
 
       {/* Collapse Toggle */}
       <button

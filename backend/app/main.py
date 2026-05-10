@@ -14,7 +14,7 @@ from app.core.database import engine, Base
 from app.models import role, department, team, employee, shift, site, task, expense, leave, holiday, attendance, report, notification, log  # noqa: F401
 
 # Import API routers
-from app.api import auth, roles, employees, departments, teams, dashboard, sites, expenses, leaves, holidays, logs
+from app.api import auth, roles, employees, departments, teams, dashboard, sites, expenses, leaves, holidays, logs, points
 from app.api.attendance import router as attendance_router_pkg
 from app.api.shifts import router as shifts_router_pkg
 from app.api.tasks import router as tasks_router_pkg
@@ -70,6 +70,7 @@ def create_app() -> FastAPI:
     app.include_router(holidays.router, prefix=settings.API_PREFIX)
     app.include_router(reports_router_pkg, prefix=settings.API_PREFIX)
     app.include_router(logs.router, prefix=settings.API_PREFIX)
+    app.include_router(points.router, prefix=settings.API_PREFIX, tags=["Points"])
 
     @app.on_event("startup")
     def startup():

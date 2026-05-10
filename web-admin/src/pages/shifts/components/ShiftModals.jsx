@@ -21,13 +21,19 @@ export default function ShiftModals({
   employees, 
   shiftTypes, 
   rawShifts, 
-  user 
+  user,
+  selectedBid 
 }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{editingPolicy ? `Edit Policy: ${editingPolicy.name}` : editingType ? `Edit Shift Type: ${editingType.name}` : actionLabel}</h2>
+          <h2>
+            {modalType === 'grantPoints' ? `Grant Points to ${selectedBid?.employee}` : 
+             editingPolicy ? `Edit Policy: ${editingPolicy.name}` : 
+             editingType ? `Edit Shift Type: ${editingType.name}` : 
+             actionLabel}
+          </h2>
           <button className="btn btn-ghost" onClick={onClose}><X size={18} /></button>
         </div>
         <form onSubmit={onSubmit}>
@@ -282,6 +288,20 @@ export default function ShiftModals({
                 <div className="alert alert-warning" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', padding: 12, borderRadius: 8, marginTop: 12 }}>
                   <div style={{ fontSize: 12, color: 'var(--primary-400)' }}>Higher points increase your chance of getting popular shifts during automated assignment.</div>
                 </div>
+              </>
+            )}
+
+            {modalType === 'grantPoints' && (
+              <>
+                <div className="form-group">
+                  <label className="form-label">Point Amount</label>
+                  <input name="amount" type="number" className="form-input" placeholder="e.g. 50" required min="1" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Reason for Grant</label>
+                  <textarea name="reason" className="form-input" placeholder="Explain why points are being granted..." required></textarea>
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>* These points will be added to the employee's bidding wallet immediately.</p>
               </>
             )}
           </div>

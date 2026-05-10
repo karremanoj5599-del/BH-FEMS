@@ -31,6 +31,7 @@ class Employee(Base):
     
     status = Column(String(20), default="Active", index=True)  # Active / Inactive / Resigned
     type = Column(String(30), default="Permanent")  # Permanent / Contract / Daily-wage
+    points_balance = Column(Integer, default=200)  # Initial points for bidding
 
     # Relationships
     role = relationship("Role", back_populates="employees")

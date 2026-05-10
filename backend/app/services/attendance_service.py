@@ -5,7 +5,7 @@ import json
 from fastapi import HTTPException
 from sqlalchemy import func
 
-from app.models import Employee, Department, Attendance, LocationTracking, SiteAttendance, Shift, ShiftType, Task
+from app.models import Employee, Department, Attendance, LocationTracking, SiteAttendance, Shift, ShiftType, Task, PointTransaction
 from app.schemas.attendance import AttendanceCreate, AttendanceCheckOut, LocationTrackingCreate
 
 class AttendanceService:
@@ -140,6 +140,20 @@ class AttendanceService:
                 db_task.status = "done"
                 db_task.notes = notes
                 db_task.media_url = photos
+                
+                # Grant points for task completion
+                att = db.query(Attendance).filter(Attendance.id == db_site_att.attendance_id).first()
+                if att:
+                    emp = db.query(Employee).filter(Employee.id == att.employee_id).first()
+                    if emp:
+                        reward = 10 # 10 points per task
+                        emp.points_balance = (emp.points_balance or 0) + reward
+                        db.add(PointTransaction(
+                            employee_id=emp.id,
+                            amount=reward,
+                            reason=f"Task Completion: {db_task.title or 'Task #' + str(db_task.id)}",
+                            reference_id=str(db_task.id)
+                        ))
         db.commit()
         db.refresh(db_site_att)
         return db_site_att

@@ -15,6 +15,7 @@ from app.models.holiday import Holiday
 from app.models.notification import Notification, NotificationRecipient
 from app.models.report import Report, ReportSchedule
 from app.models.log import Log
+from app.models.points import PointTransaction
 
 __all__ = [
     "Base",
@@ -49,4 +50,5 @@ __all__ = [
     "Report",
     "ReportSchedule",
     "Log",
+    "PointTransaction"
 ]

@@ -1,7 +1,7 @@
 import React from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Plus, Star } from 'lucide-react';
 
-export default function BiddingTab({ displayBids }) {
+export default function BiddingTab({ displayBids, isAdmin, onGrantPoints }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
       <div className="card">
@@ -15,6 +15,7 @@ export default function BiddingTab({ displayBids }) {
                 <th>Shift Type</th>
                 <th>Preference Points</th>
                 <th>Status</th>
+                {isAdmin && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -29,6 +30,17 @@ export default function BiddingTab({ displayBids }) {
                       {bid.status}
                     </span>
                   </td>
+                  {isAdmin && (
+                    <td>
+                      <button 
+                        className="btn btn-ghost btn-sm" 
+                        style={{ color: 'var(--primary-400)', padding: '4px 8px', gap: 4 }}
+                        onClick={() => onGrantPoints(bid)}
+                      >
+                        <Plus size={14} /> Give Pts
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

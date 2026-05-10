@@ -34,6 +34,7 @@ export default function ShiftsPage() {
     { id: 1, type: 'Night Shift', employee: 'Amit Singh', points: 120, priority: 1, status: 'Confirmed' },
     { id: 2, type: 'Night Shift', employee: 'Suresh Raina', points: 85, priority: 2, status: 'Pending' },
   ]);
+  const [selectedBid, setSelectedBid] = useState(null);
 
   // Week Navigation State
   const getMonday = (d) => {
@@ -235,6 +236,12 @@ export default function ShiftsPage() {
     setShowModal(true);
   };
 
+  const handleGrantPointsClick = (bid) => {
+    setSelectedBid(bid);
+    setModalType('grantPoints');
+    setShowModal(true);
+  };
+
   const handleModalSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -293,6 +300,11 @@ export default function ShiftsPage() {
           status: 'Pending'
         };
         await api.post('/shifts/swap-requests', payload);
+      } else if (modalType === 'grantPoints') {
+        const empId = employees.find(e => e.name === selectedBid.employee)?.id;
+        if (!empId) throw new Error("Employee not found");
+        await api.post(`/points/grant?employee_id=${empId}&amount=${formData.get('amount')}&reason=${formData.get('reason')}`);
+        alert("Points granted successfully!");
       }
       fetchData();
       setShowModal(false);
@@ -348,7 +360,7 @@ export default function ShiftsPage() {
       {activeTab === 'schedule' && <ScheduleTab formatDateRange={formatDateRange} handlePrevWeek={handlePrevWeek} handleToday={handleToday} handleNextWeek={handleNextWeek} getWeekDays={getWeekDays} displaySchedule={displaySchedule} employees={employees} />}
       {activeTab === 'swaps' && <SwapsTab displaySwaps={displaySwaps} isEmployee={isEmployee} user={user} handleSwapAction={handleSwapAction} />}
       {activeTab === 'policy' && <PolicyTab policies={policies} onEditPolicy={handleEditPolicyClick} onDeletePolicy={handleDeletePolicy} />}
-      {activeTab === 'bidding' && <BiddingTab displayBids={displayBids} />}
+      {activeTab === 'bidding' && <BiddingTab displayBids={displayBids} isAdmin={!isEmployee} onGrantPoints={handleGrantPointsClick} />}
 
       {showModal && (
         <ShiftModals
@@ -363,6 +375,7 @@ export default function ShiftsPage() {
           shiftTypes={shiftTypes}
           rawShifts={rawShifts}
           user={user}
+          selectedBid={selectedBid}
         />
       )}
 
