@@ -1,7 +1,7 @@
 import React from 'react';
-import { AlertCircle, Plus, Star } from 'lucide-react';
+import { AlertCircle, Plus, Star, Check, X } from 'lucide-react';
 
-export default function BiddingTab({ displayBids, isAdmin, onGrantPoints }) {
+export default function BiddingTab({ displayBids, isAdmin, onGrantPoints, onBidAction }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24 }}>
       <div className="card">
@@ -30,15 +30,37 @@ export default function BiddingTab({ displayBids, isAdmin, onGrantPoints }) {
                       {bid.status}
                     </span>
                   </td>
-                  {isAdmin && (
+                   {isAdmin && (
                     <td>
-                      <button 
-                        className="btn btn-ghost btn-sm" 
-                        style={{ color: 'var(--primary-400)', padding: '4px 8px', gap: 4 }}
-                        onClick={() => onGrantPoints(bid)}
-                      >
-                        <Plus size={14} /> Give Pts
-                      </button>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        {bid.status === 'Pending' && (
+                          <>
+                            <button 
+                              className="btn btn-ghost btn-sm" 
+                              style={{ color: 'var(--success-400)', padding: '4px 8px' }}
+                              title="Approve Bid"
+                              onClick={() => onBidAction(bid.id, 'Confirmed')}
+                            >
+                              <Check size={14} />
+                            </button>
+                            <button 
+                              className="btn btn-ghost btn-sm" 
+                              style={{ color: 'var(--danger-400)', padding: '4px 8px' }}
+                              title="Reject Bid"
+                              onClick={() => onBidAction(bid.id, 'Rejected')}
+                            >
+                              <X size={14} />
+                            </button>
+                          </>
+                        )}
+                        <button 
+                          className="btn btn-ghost btn-sm" 
+                          style={{ color: 'var(--primary-400)', padding: '4px 8px', gap: 4 }}
+                          onClick={() => onGrantPoints(bid)}
+                        >
+                          <Plus size={14} /> Give Pts
+                        </button>
+                      </div>
                     </td>
                   )}
                 </tr>

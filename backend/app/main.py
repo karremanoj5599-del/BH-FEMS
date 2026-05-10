@@ -84,7 +84,10 @@ def create_app() -> FastAPI:
                 # 1. Add points_balance to employees if missing
                 conn.execute(text("ALTER TABLE employees ADD COLUMN IF NOT EXISTS points_balance INTEGER DEFAULT 200"))
                 
-                # 2. Create point_transactions table if missing
+                # 2. Add status to shift_bids if missing
+                conn.execute(text("ALTER TABLE shift_bids ADD COLUMN IF NOT EXISTS status VARCHAR(30) DEFAULT 'Pending'"))
+                
+                # 3. Create point_transactions table if missing
                 conn.execute(text("""
                     CREATE TABLE IF NOT EXISTS point_transactions (
                         id SERIAL PRIMARY KEY,
@@ -96,7 +99,7 @@ def create_app() -> FastAPI:
                     )
                 """))
                 conn.commit()
-                print("Database migrations (Points System) completed successfully.")
+                print("Database migrations (Points & Bidding System) completed successfully.")
         except Exception as e:
             print(f"Migration warning (might be handled by Alembic): {e}")
 

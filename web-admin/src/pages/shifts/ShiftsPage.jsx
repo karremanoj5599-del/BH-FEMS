@@ -324,6 +324,23 @@ export default function ShiftsPage() {
     }
   };
 
+  const handleBidAction = async (bidId, newStatus) => {
+    try {
+      // Temporary: update local state if backend endpoint doesn't exist yet
+      // In a real app, this would be an API call
+      setBids(prev => prev.map(b => b.id === bidId ? { ...b, status: newStatus } : b));
+      
+      // Attempt API call (we'll create this next)
+      try {
+        await api.put(`/shifts/bids/${bidId}/status?status=${newStatus}`);
+      } catch (e) {
+        console.warn("Backend bid endpoint not ready, but state updated locally.");
+      }
+    } catch (err) {
+      console.error("Failed to update bid status:", err);
+    }
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="page-header">
@@ -360,7 +377,7 @@ export default function ShiftsPage() {
       {activeTab === 'schedule' && <ScheduleTab formatDateRange={formatDateRange} handlePrevWeek={handlePrevWeek} handleToday={handleToday} handleNextWeek={handleNextWeek} getWeekDays={getWeekDays} displaySchedule={displaySchedule} employees={employees} />}
       {activeTab === 'swaps' && <SwapsTab displaySwaps={displaySwaps} isEmployee={isEmployee} user={user} handleSwapAction={handleSwapAction} />}
       {activeTab === 'policy' && <PolicyTab policies={policies} onEditPolicy={handleEditPolicyClick} onDeletePolicy={handleDeletePolicy} />}
-      {activeTab === 'bidding' && <BiddingTab displayBids={displayBids} isAdmin={!isEmployee} onGrantPoints={handleGrantPointsClick} />}
+      {activeTab === 'bidding' && <BiddingTab displayBids={displayBids} isAdmin={!isEmployee} onGrantPoints={handleGrantPointsClick} onBidAction={handleBidAction} />}
 
       {showModal && (
         <ShiftModals

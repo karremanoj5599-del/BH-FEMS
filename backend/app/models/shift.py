@@ -115,6 +115,7 @@ class ShiftBid(Base):
     shift_type_id = Column(Integer, ForeignKey("shift_types.id"), nullable=False)
     points = Column(Integer, default=0)
     priority = Column(Integer, default=0)
+    status = Column(String(30), default="Pending")
 
     employee = relationship("Employee", back_populates="shift_bids")
     shift_type = relationship("ShiftType", back_populates="bids")
