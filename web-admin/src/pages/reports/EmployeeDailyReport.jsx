@@ -68,14 +68,12 @@ function LocationLink({ lat, long, label }) {
   );
 }
 
-function formatLocalTime(isoStr, options = { hour: '2-digit', minute: '2-digit', second: '2-digit' }) {
+function formatLocalTime(isoStr, options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) {
   if (!isoStr) return '--:--';
   try {
     const date = new Date(isoStr);
-    // If the string doesn't end in Z and doesn't have an offset, it might be interpreted as local.
-    // Our backend sends it as UTC. We ensure it's treated as UTC.
     const utcDate = isoStr.endsWith('Z') || isoStr.includes('+') ? date : new Date(isoStr + 'Z');
-    return utcDate.toLocaleTimeString([], options);
+    return utcDate.toLocaleTimeString([], { ...options, hour12: false });
   } catch (e) {
     return isoStr;
   }

@@ -70,7 +70,7 @@ export default function AttendancePage() {
       const active = (historyRes.data || []).find(h => h.status === 'Present' && !h.check_out);
       if (active) {
         setIsPresent(true);
-        setCheckInTime(new Date(active.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        setCheckInTime(new Date(active.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
       } else {
         setIsPresent(false);
         setCheckInTime(null);
@@ -204,7 +204,7 @@ export default function AttendancePage() {
       }).catch(e => console.log("Initial breadcrumb failed"));
 
       setIsPresent(true);
-      setCheckInTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      setCheckInTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
       setSelfieMode('idle');
       setSelfieImage(null);
       fetchData(); 

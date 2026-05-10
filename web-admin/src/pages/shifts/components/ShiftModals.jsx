@@ -1,5 +1,14 @@
-import React from 'react';
 import { X, Shield, FileCheck } from 'lucide-react';
+
+const format24h = (timeStr) => {
+  if (!timeStr) return '-';
+  // If timeStr is already HH:MM or HH:MM:SS, we just slice it if it has seconds
+  if (timeStr.includes(':')) {
+    const parts = timeStr.split(':');
+    return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+  }
+  return timeStr;
+};
 
 export default function ShiftModals({ 
   modalType, 
@@ -211,7 +220,7 @@ export default function ShiftModals({
                   <select name="shift_type_id" className="form-select" required>
                     <option value="">Select Shift Type...</option>
                     {shiftTypes.map(s => (
-                      <option key={s.id} value={s.id}>{s.name} ({s.start_time}-{s.end_time})</option>
+                      <option key={s.id} value={s.id}>{s.name} ({format24h(s.start_time)}-{format24h(s.end_time)})</option>
                     ))}
                   </select>
                 </div>

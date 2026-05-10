@@ -1,6 +1,15 @@
 import React from 'react';
 import { Timer, Edit2, Trash2 } from 'lucide-react';
 
+const format24h = (timeStr) => {
+  if (!timeStr) return '-';
+  if (timeStr.includes(':')) {
+    const parts = timeStr.split(':');
+    return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+  }
+  return timeStr;
+};
+
 export default function ShiftTypesTab({ shiftTypes, onEdit, onDelete }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 16 }}>
@@ -22,7 +31,7 @@ export default function ShiftTypesTab({ shiftTypes, onEdit, onDelete }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
             <div className="card" style={{ background: 'var(--surface-2)', padding: 12, border: 'none' }}>
               <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Timing</div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>{type.start_time} - {type.end_time}</div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{format24h(type.start_time)} - {format24h(type.end_time)}</div>
             </div>
             <div className="card" style={{ background: 'var(--surface-2)', padding: 12, border: 'none' }}>
               <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Grace / Break</div>

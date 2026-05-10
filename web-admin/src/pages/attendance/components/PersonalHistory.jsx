@@ -60,7 +60,7 @@ export default function PersonalHistory({ selfieMode, isPresent, history }) {
                 .map(item => (
                 <tr key={item.id}>
                   <td style={{ fontWeight: 600 }}>{item.check_in ? new Date(item.check_in).toLocaleDateString() : '-'}</td>
-                  <td>{item.check_in ? new Date(item.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}</td>
+                  <td>{item.check_in ? new Date(item.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '-'}</td>
                   <td>{item.site || 'Main Site'}</td>
                   <td>
                     <span className={`badge ${item.status === 'On-Time' || item.status === 'Present' ? 'badge-active' : 'badge-pending'}`}>
