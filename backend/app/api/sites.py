@@ -14,7 +14,7 @@ from app.services.site_service import SiteService
 
 router = APIRouter(prefix="/sites", tags=["Sites"])
 
-@router.post("/", response_model=SiteOut)
+@router.post("", response_model=SiteOut)
 def create_site(
     site_in: SiteCreate,
     db: Session = Depends(get_db),
@@ -24,7 +24,7 @@ def create_site(
     log_activity(db, current_user.id, "CREATE", "Site", db_site.id, {"name": db_site.name})
     return db_site
 
-@router.get("/", response_model=List[SiteOut])
+@router.get("", response_model=List[SiteOut])
 def get_sites(
     skip: int = 0, 
     limit: int = 100, 
