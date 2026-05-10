@@ -78,13 +78,8 @@ def create_app() -> FastAPI:
         if settings.DEBUG:
             Base.metadata.create_all(bind=engine)
 
-    @app.get("/")
-    def root():
-        return {
-            "app": settings.APP_NAME,
-            "version": settings.APP_VERSION,
-            "docs": "/docs",
-        }
+    # Removed root route to allow SPA to take priority on /
+
 
     @app.get("/health")
     def health_check():
