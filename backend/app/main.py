@@ -31,8 +31,6 @@ def create_app() -> FastAPI:
     origins = [
         "http://localhost:5173",
         "http://localhost:3000",
-        "https://bh-fems-web-admin.vercel.app",  # Production Frontend
-        "https://bh-fems-web-admin-i8id.vercel.app", # Backend itself
     ]
     
     # Add settings origins and variations

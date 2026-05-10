@@ -40,7 +40,6 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173", 
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://bh-fems.vercel.app"
     ]
 
     # Pagination
@@ -94,5 +93,4 @@ try:
 except Exception as e:
     import sys
     print(f"CRITICAL ERROR: Failed to load settings: {e}")
-    # In Vercel, we still want to expose the error to the logs
     raise e

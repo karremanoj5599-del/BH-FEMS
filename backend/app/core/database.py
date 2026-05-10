@@ -8,8 +8,6 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from app.core.config import settings
 
 
-from sqlalchemy.pool import NullPool
-
 is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 
 if is_sqlite:
@@ -25,10 +23,8 @@ if is_sqlite:
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
 else:
-    # Use NullPool for serverless (Vercel) to avoid connection leaks
     engine = create_engine(
         settings.DATABASE_URL,
-        poolclass=NullPool,
         echo=settings.DEBUG,
     )
 
