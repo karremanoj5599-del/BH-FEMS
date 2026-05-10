@@ -39,7 +39,8 @@ class Settings(BaseSettings):
         "http://localhost:5173", 
         "http://127.0.0.1:5173", 
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "https://bh-fems.vercel.app"
     ]
 
     # Pagination
@@ -82,7 +83,7 @@ class Settings(BaseSettings):
         return v
 
     model_config = {
-        "env_file": str(ENV_PATH),
+        "env_file": str(ENV_PATH) if ENV_PATH.exists() else None,
         "case_sensitive": True,
         "extra": "ignore"
     }
