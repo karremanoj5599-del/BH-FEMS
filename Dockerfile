@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy package files and install dependencies
 COPY package*.json ./
 COPY web-admin/package*.json ./web-admin/
-RUN npm install
+RUN rm -f package-lock.json && npm install
 
 # Copy frontend source and build
 COPY web-admin/ ./web-admin/
