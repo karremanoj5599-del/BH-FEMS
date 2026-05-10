@@ -66,7 +66,7 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def fix_database_url(cls, v: Any) -> str:
-        if isinstance(v, str) and v.startswith("postgres://"):
+        if isinstance(v, str) and v.startswith("postgres://") and not v.startswith("postgresql://"):
             return v.replace("postgres://", "postgresql://", 1)
         return v
 
