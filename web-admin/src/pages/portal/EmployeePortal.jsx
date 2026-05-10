@@ -16,15 +16,12 @@ export default function EmployeePortal() {
   }, []);
 
   const stats = [
-    { label: 'Shift Time', value: '06h 45m', icon: Timer, color: 'var(--primary-400)' },
-    { label: 'Tasks Done', value: '12/15', icon: CheckCircle, color: 'var(--success-400)' },
-    { label: 'Attendance', value: '98%', icon: TrendingUp, color: 'var(--accent-400)' },
+    { label: 'Shift Time', value: '--', icon: Timer, color: 'var(--primary-400)' },
+    { label: 'Tasks Done', value: '0/0', icon: CheckCircle, color: 'var(--success-400)' },
+    { label: 'Attendance', value: '--', icon: TrendingUp, color: 'var(--accent-400)' },
   ];
 
-  const recentTasks = [
-    { id: 1, title: 'Check Power Grid B', site: 'Substation Alpha', time: '10:00 AM', status: 'Completed' },
-    { id: 2, title: 'Replace Transformer Fuse', site: 'Main Plant', time: '02:30 PM', status: 'Upcoming' },
-  ];
+  const recentTasks = [];
 
   return (
     <div className="animate-fade-in employee-portal">
@@ -65,37 +62,47 @@ export default function EmployeePortal() {
               <button className="btn btn-ghost btn-sm" style={{ color: 'var(--primary-400)', fontWeight: 600 }}>View All Tasks</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {recentTasks.map(task => (
-                <div key={task.id} style={{ 
-                  padding: '16px 20px', background: 'var(--surface-2)', borderRadius: 16, 
-                  display: 'flex', alignItems: 'center', gap: 16,
-                  border: '1px solid var(--border-subtle)',
-                  transition: 'all 0.2s ease',
-                  cursor: 'pointer'
-                }} className="focus-card">
-                  <div style={{
-                    width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                    background: task.status === 'Completed' ? 'rgba(16,185,129,0.1)' : 'rgba(99,102,241,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}>
-                    <ClipboardList size={20} color={task.status === 'Completed' ? '#10b981' : 'var(--primary-400)'} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{task.title}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <MapPin size={11} /> {task.site} • <Timer size={11} /> {task.time}
+              {recentTasks.length > 0 ? (
+                recentTasks.map(task => (
+                  <div key={task.id} style={{ 
+                    padding: '16px 20px', background: 'var(--surface-2)', borderRadius: 16, 
+                    display: 'flex', alignItems: 'center', gap: 16,
+                    border: '1px solid var(--border-subtle)',
+                    transition: 'all 0.2s ease',
+                    cursor: 'pointer'
+                  }} className="focus-card">
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                      background: task.status === 'Completed' ? 'rgba(16,185,129,0.1)' : 'rgba(99,102,241,0.1)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                      <ClipboardList size={20} color={task.status === 'Completed' ? '#10b981' : 'var(--primary-400)'} />
                     </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{task.title}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <MapPin size={11} /> {task.site} • <Timer size={11} /> {task.time}
+                      </div>
+                    </div>
+                    <span style={{
+                      padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                      background: task.status === 'Completed' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
+                      color: task.status === 'Completed' ? '#10b981' : '#f59e0b',
+                      border: `1px solid ${task.status === 'Completed' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}`
+                    }}>
+                      {task.status}
+                    </span>
                   </div>
-                  <span style={{
-                    padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                    background: task.status === 'Completed' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
-                    color: task.status === 'Completed' ? '#10b981' : '#f59e0b',
-                    border: `1px solid ${task.status === 'Completed' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}`
-                  }}>
-                    {task.status}
-                  </span>
+                ))
+              ) : (
+                <div style={{ 
+                  padding: '40px 20px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', 
+                  borderRadius: 16, border: '1px dashed var(--border-subtle)',
+                  color: 'var(--text-muted)', fontSize: 14
+                }}>
+                  No tasks assigned for today.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
