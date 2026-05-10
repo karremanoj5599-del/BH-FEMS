@@ -147,9 +147,22 @@ def get_employee_daily_report(employee_id: int, date: str, db: Session = Depends
     # Sort timeline by time
     timeline.sort(key=lambda x: x["time"])
     
-    # Format times for JSON response
+    # Format times for JSON response - Send full ISO format for frontend to handle timezone
     for item in timeline:
-        item["time"] = item["time"].strftime("%H:%M:%S")
+        item["time"] = item["time"].isoformat() if item["time"] else None
+
+    # Fix other time fields as well
+    if att and att.check_in:
+        report["checkInTime"] = att.check_in.isoformat()
+    if att and att.check_out:
+        report["checkOutTime"] = att.check_out.isoformat()
+    
+    for sa in report["sitesVisited"]:
+        # We need to find the original sa objects to get the datetimes
+        orig_sa = next((s for s in site_attendances if s.id == sa["id"]), None)
+        if orig_sa:
+            sa["checkIn"] = orig_sa.check_in.isoformat() if orig_sa.check_in else None
+            sa["checkOut"] = orig_sa.check_out.isoformat() if orig_sa.check_out else None
 
     report["timeline"] = timeline
 

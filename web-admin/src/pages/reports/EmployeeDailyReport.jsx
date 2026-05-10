@@ -68,6 +68,19 @@ function LocationLink({ lat, long, label }) {
   );
 }
 
+function formatLocalTime(isoStr, options = { hour: '2-digit', minute: '2-digit', second: '2-digit' }) {
+  if (!isoStr) return '--:--';
+  try {
+    const date = new Date(isoStr);
+    // If the string doesn't end in Z and doesn't have an offset, it might be interpreted as local.
+    // Our backend sends it as UTC. We ensure it's treated as UTC.
+    const utcDate = isoStr.endsWith('Z') || isoStr.includes('+') ? date : new Date(isoStr + 'Z');
+    return utcDate.toLocaleTimeString([], options);
+  } catch (e) {
+    return isoStr;
+  }
+}
+
 export default function EmployeeDailyReport() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -179,7 +192,7 @@ export default function EmployeeDailyReport() {
             <h3 style={{ fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
               <CheckCircle2 color="var(--success-400)" size={18} /> Check In
             </h3>
-            <span style={{ fontSize: 18, fontWeight: 700 }}>{report.checkInTime || '--:--'}</span>
+            <span style={{ fontSize: 18, fontWeight: 700 }}>{formatLocalTime(report.checkInTime)}</span>
           </div>
           
           <div style={{ display: 'flex', gap: 16 }}>
@@ -211,7 +224,7 @@ export default function EmployeeDailyReport() {
             <h3 style={{ fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Clock color="var(--warning-400)" size={18} /> Check Out
             </h3>
-            <span style={{ fontSize: 18, fontWeight: 700 }}>{report.checkOutTime || '--:--'}</span>
+            <span style={{ fontSize: 18, fontWeight: 700 }}>{formatLocalTime(report.checkOutTime)}</span>
           </div>
           
           <div style={{ display: 'flex', gap: 16 }}>
@@ -342,7 +355,7 @@ export default function EmployeeDailyReport() {
                 }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
                   <h4 style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>{event.title}</h4>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0, marginLeft: 8 }}>{event.time}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0, marginLeft: 8 }}>{formatLocalTime(event.time)}</span>
                 </div>
                 <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, marginBottom: 4 }}>{event.description}</p>
                 {event.lat != null && event.long != null && (
@@ -382,8 +395,8 @@ export default function EmployeeDailyReport() {
                           </span>
                         </td>
                         <td style={{ fontWeight: 500 }}>{site.siteName}</td>
-                        <td>{site.checkIn || '-'}</td>
-                        <td>{site.checkOut || '-'}</td>
+                        <td>{formatLocalTime(site.checkIn, { hour: '2-digit', minute: '2-digit' })}</td>
+                        <td>{formatLocalTime(site.checkOut, { hour: '2-digit', minute: '2-digit' })}</td>
                         <td>
                           {site.lat && site.long ? (
                             <LocationLink lat={site.lat} long={site.long} label="View" />
