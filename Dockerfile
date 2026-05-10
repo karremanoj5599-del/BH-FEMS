@@ -9,6 +9,8 @@ RUN rm -f package-lock.json && npm install
 
 # Copy frontend source and build
 COPY web-admin/ ./web-admin/
+ARG VITE_GOOGLE_CLIENT_ID
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 RUN npm run build --workspace=web-admin
 
 # Stage 2: Build the FastAPI Backend
