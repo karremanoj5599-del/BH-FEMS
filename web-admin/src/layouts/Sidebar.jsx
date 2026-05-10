@@ -81,7 +81,7 @@ export default function Sidebar({ collapsed, onToggle }) {
             // Special case for administrative modules
             const adminOnlyPerms = ['employees', 'departments', 'teams', 'shifts', 'sites', 'reports', 'roles', 'logs'];
             if (adminOnlyPerms.includes(item.perm)) {
-              return hasRole(['Admin', 'HR', 'Manager', 'Supervisor']);
+              return hasRole(['Super Admin', 'Admin', 'HR', 'Manager', 'Supervisor']);
             }
 
             return hasPermission(item.perm) || hasPermission(`my_${item.perm}`);

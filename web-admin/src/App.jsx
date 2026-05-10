@@ -46,7 +46,7 @@ function ProtectedRoute({ children, permission, roles }) {
 }
 
 export default function App() {
-  const adminRoles = ['Admin', 'HR', 'Manager', 'Supervisor'];
+  const adminRoles = ['Super Admin', 'Admin', 'HR', 'Manager', 'Supervisor'];
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   
   return (
@@ -65,7 +65,7 @@ export default function App() {
               <Route path="/employees" element={<ProtectedRoute roles={adminRoles}><EmployeeList /></ProtectedRoute>} />
               <Route path="/departments" element={<ProtectedRoute roles={adminRoles}><DepartmentList /></ProtectedRoute>} />
               <Route path="/teams" element={<ProtectedRoute roles={adminRoles}><TeamList /></ProtectedRoute>} />
-              <Route path="/roles" element={<ProtectedRoute roles={['Admin']}><RolesList /></ProtectedRoute>} />
+              <Route path="/roles" element={<ProtectedRoute roles={['Super Admin', 'Admin']}><RolesList /></ProtectedRoute>} />
               
               {/* Phase 2: Sites & Shifts */}
               <Route path="/shifts" element={<ProtectedRoute roles={adminRoles}><ShiftsPage /></ProtectedRoute>} />
@@ -98,7 +98,7 @@ export default function App() {
               <Route path="/reports/employee/:id/monthly" element={<ProtectedRoute roles={adminRoles}><EmployeeMonthlyReport /></ProtectedRoute>} />
               
               {/* Phase 7: Logs */}
-              <Route path="/logs" element={<ProtectedRoute roles={['Admin', 'Manager']}><LogsPage /></ProtectedRoute>} />
+              <Route path="/logs" element={<ProtectedRoute roles={['Super Admin', 'Admin', 'Manager']}><LogsPage /></ProtectedRoute>} />
             </Route>
 
             {/* Catch-all */}
